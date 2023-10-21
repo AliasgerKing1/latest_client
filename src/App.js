@@ -41,8 +41,7 @@ let App = () => {
   const sHeader = JSON.stringify(oHeader)
   const sPayload = JSON.stringify(oPayload)
   const signature = KJUR.jws.JWS.sign('HS256', sHeader, sPayload, 'mOxIcpXsoSLu9E6Ldz61rJ7MQNZDyNQ3')
-    let data = await axios.get(`https://localhost:4000`)
-    // console.log(data)
+    let data = await axios.post('http://localhost:4000/', {token : signature})
     console.log("🚀 ~ file: App.js:28 ~ getUserData ~ data:", data)
   }
   let getSignature = async (e) => {
