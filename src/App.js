@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { ZoomMtg } from '@zoomus/websdk';
 import axios from 'axios'
-// import {KJUR} from 'jsrsasign'
+import {KJUR} from 'jsrsasign'
 ZoomMtg.setZoomJSLib('https://source.zoom.us/2.17.0/lib', '/av');
 ZoomMtg.preLoadWasm();
 ZoomMtg.prepareWebSDK();
@@ -14,40 +14,64 @@ let App = () => {
   const [participantsPrev, setParticipantsPrev] = useState([]);
 
   var sdkKey = 'TQkzoP8MSQOOE0YaY_2fbg';
-  var meetingNumber = '83084814967';
-  var passWord = 'HsNC3p';
+  var meetingNumber = '83356998877';
+  var passWord = '1QLu3b';
   var role = 0;
   var userName = 'React';
   var userEmail = 'aliasgersub34@gmail.com';
   var leaveUrl = 'http://localhost:3000';
 
+  let getUserData = async (e) => {
+    e.preventDefault();
+    const iat = Math.round(new Date().getTime() / 1000) - 30;
+  const exp = iat + 60 * 60 * 2
+
+  const oHeader = { alg: 'HS256', typ: 'JWT' }
+
+  const oPayload = {
+    sdkKey: 'TQkzoP8MSQOOE0YaY_2fbg',
+    mn:meetingNumber,
+    role: role,
+    iat: iat,
+    exp: exp,
+    appKey: 'TQkzoP8MSQOOE0YaY_2fbg',
+    tokenExp: iat + 60 * 60 * 2
+  }
+
+  const sHeader = JSON.stringify(oHeader)
+  const sPayload = JSON.stringify(oPayload)
+  const signature = KJUR.jws.JWS.sign('HS256', sHeader, sPayload, 'mOxIcpXsoSLu9E6Ldz61rJ7MQNZDyNQ3')
+    let data = await axios.get(`https://localhost:4000`)
+    // console.log(data)
+    console.log("🚀 ~ file: App.js:28 ~ getUserData ~ data:", data)
+  }
   let getSignature = async (e) => {
     e.preventDefault();
-     let obj = {
-  meetingNumber : meetingNumber,
-  role : role
-     }
-    let result = await axios.post('http://localhost:4000', obj)
+  //    let obj = {
+  // meetingNumber : meetingNumber,
+  // role : role
+  //    }
+    // let result = await axios.post('http://localhost:4000', obj)
     
-  // const iat = Math.round(new Date().getTime() / 1000) - 30;
-  // const exp = iat + 60 * 60 * 2
+  const iat = Math.round(new Date().getTime() / 1000) - 30;
+  const exp = iat + 60 * 60 * 2
 
-  // const oHeader = { alg: 'HS256', typ: 'JWT' }
+  const oHeader = { alg: 'HS256', typ: 'JWT' }
 
-  // const oPayload = {
-  //   sdkKey: 'TQkzoP8MSQOOE0YaY_2fbg',
-  //   mn:meetingNumber,
-  //   role: role,
-  //   iat: iat,
-  //   exp: exp,
-  //   appKey: 'TQkzoP8MSQOOE0YaY_2fbg',
-  //   tokenExp: iat + 60 * 60 * 2
-  // }
+  const oPayload = {
+    sdkKey: 'TQkzoP8MSQOOE0YaY_2fbg',
+    mn:meetingNumber,
+    role: role,
+    iat: iat,
+    exp: exp,
+    appKey: 'TQkzoP8MSQOOE0YaY_2fbg',
+    tokenExp: iat + 60 * 60 * 2
+  }
 
-  // const sHeader = JSON.stringify(oHeader)
-  // const sPayload = JSON.stringify(oPayload)
-  // const signature = KJUR.jws.JWS.sign('HS256', sHeader, sPayload, 'mOxIcpXsoSLu9E6Ldz61rJ7MQNZDyNQ3')
-    startMeeting(result?.data?.signature)
+  const sHeader = JSON.stringify(oHeader)
+  const sPayload = JSON.stringify(oPayload)
+  const signature = KJUR.jws.JWS.sign('HS256', sHeader, sPayload, 'mOxIcpXsoSLu9E6Ldz61rJ7MQNZDyNQ3')
+    startMeeting(signature)
   }
 
   let startMeeting = (signature) => {
@@ -75,7 +99,7 @@ let App = () => {
                 );
                 // setParticipants(sortedParticipants);
                 setManageZIndex(sortedParticipants.length)
-                console.log(sortedParticipants)
+                console.log('length of sorted participants', sortedParticipants.length)
               }
             });
           },
@@ -118,13 +142,30 @@ let App = () => {
            paddingBottom: '10px',
            paddingLeft: '40px',
            paddingRight: '40px',
-           display: 'inline-block',
+           display: 'block',
            borderRadius: '10px',
            cursor: 'pointer',
            border: 'none',
            outline: 'none',
         }} onClick={getSignature} type="button">
           Join Meeting
+        </button>
+        <button style={{
+           marginTop: '20px',
+           backgroundColor: 'red',
+           color: '#ffffff',
+           textDecoration: 'none',
+           paddingTop: '10px',
+           paddingBottom: '10px',
+           paddingLeft: '40px',
+           paddingRight: '40px',
+           display: 'inline-block',
+           borderRadius: '10px',
+           cursor: 'pointer',
+           border: 'none',
+           outline: 'none',
+        }} onClick={getUserData} type="button">
+          Get User Data
         </button>
       </main>
       </div>
