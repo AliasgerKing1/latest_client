@@ -70,7 +70,7 @@ let Meeting = () => {
                 const sortedParticipants = res.result.attendeesList.sort((a, b) =>
                 a.userName.localeCompare(b.userName)
                 );
-                localStorage.setItem('participants', sortedParticipants)
+                localStorage.setItem('participants', JSON.stringify(sortedParticipants))
                 setManageZIndex(sortedParticipants.length)
               }
             });
