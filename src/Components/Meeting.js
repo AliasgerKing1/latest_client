@@ -17,7 +17,7 @@ let Meeting = () => {
   var role = 0;
   var userName = 'React';
   var userEmail = 'aliasgersub34@gmail.com';
-  var leaveUrl = 'http://localhost:3000';
+  var leaveUrl = 'https://latest-client-9h1e.vercel.app/';
 
   let getSignature = async (e) => {
     e.preventDefault();
