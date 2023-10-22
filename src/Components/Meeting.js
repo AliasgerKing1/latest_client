@@ -21,12 +21,6 @@ let Meeting = () => {
 
   let getSignature = async (e) => {
     e.preventDefault();
-  //    let obj = {
-  // meetingNumber : meetingNumber,
-  // role : role
-  //    }
-    // let result = await axios.post('http://localhost:4000', obj)
-    
   const iat = Math.round(new Date().getTime() / 1000) - 30;
   const exp = iat + 60 * 60 * 2
 
@@ -67,12 +61,48 @@ let Meeting = () => {
             console.log('success', success);
             ZoomMtg.getAttendeeslist({
               success: (res) => {
-                const sortedParticipants = res.result.attendeesList.sort((a, b) =>
-                a.userName.localeCompare(b.userName)
-                );
-                localStorage.setItem('participants', JSON.stringify(sortedParticipants))
-                setManageZIndex(sortedParticipants.length)
+                localStorage.setItem('participants', JSON.stringify(res.result.attendeesList))
+                setManageZIndex(res.result.attendeesList.length)
               }
+            });
+            ZoomMtg.inMeetingServiceListener('onUserJoin', function (data) {
+              console.log('inMeetingServiceListener onUserJoin', data);
+              
+// Retrieve the current array from localStorage
+let myArray = JSON.parse(localStorage.getItem('participants'));
+
+// Check if the array exists. If not, initialize it
+if (!myArray) {
+  myArray = [];
+}
+
+// Push the new object into the array
+myArray.push(data);
+
+// Set the updated array back into localStorage
+localStorage.setItem('participants', JSON.stringify(myArray));
+            });
+            ZoomMtg.inMeetingServiceListener('onUserLeave', function (data) {
+              console.log('inMeetingServiceListener onUserLeave', data);
+              
+              // Retrieve the current array from localStorage
+              let myArray = JSON.parse(localStorage.getItem('participants'));
+            
+              // Check if the array exists. If not, initialize it
+              if (!myArray) {
+                myArray = [];
+              }
+            
+              // Find the index of the user in the array
+              let index = myArray.findIndex(user => user.userId === data.userId);
+            
+              // If the user is found in the array, remove them
+              if (index !== -1) {
+                myArray.splice(index, 1);
+              }
+            
+              // Set the updated array back into localStorage
+              localStorage.setItem('participants', JSON.stringify(myArray));
             });
           },
           error: (error) => {
@@ -92,7 +122,7 @@ let Meeting = () => {
       <NavLinks />
       </aside>
       <main style={{ flex: '3' }}>
-        <h1>Zoom Meeting React</h1>
+        <h1 style={{color : '#fff'}}>Zoom Meeting React</h1>
         <button style={{
            marginTop: '20px',
            backgroundColor: '#2D8CFF',
